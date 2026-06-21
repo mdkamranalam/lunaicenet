@@ -167,7 +167,7 @@ Elevated CPR can also arise from rough, blocky terrain (crater walls, ejecta fie
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/LunaIceNet.git
+git clone https://github.com/mdkamranalam/lunaicenet
 cd LunaIceNet
 
 # Create and activate virtual environment
