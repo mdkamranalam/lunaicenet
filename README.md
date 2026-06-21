@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Mission-Chandrayaan--2-blue?style=for-the-badge" alt="Mission Badge"/>
-  <img src="https://img.shields.io/badge/Hackathon-ISRO--Bharatiya--Antariksh--Hackathon--2026-orange?style=for-the-badge" alt="Problem Statement Badge"/>
+  <img src="https://img.shields.io/badge/Hackathon-ISRO Bharatiya Antariksh Hackathon 2026-orange?style=for-the-badge" alt="Problem Statement Badge"/>
   <img src="https://img.shields.io/badge/Python-3.9+-green?style=for-the-badge&logo=python&logoColor=white" alt="Python Badge"/>
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License Badge"/>
 </p>
