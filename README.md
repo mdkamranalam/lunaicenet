@@ -68,45 +68,45 @@ Elevated CPR can also arise from rough, blocky terrain (crater walls, ejecta fie
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        LunaIceNet Pipeline                         │
+│                        LunaIceNet Pipeline                          │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐   │
-│  │  DFSAR Data   │    │  OHRC Images │    │  LOLA DEM + Illum.  │   │
-│  │ (L/S-band)    │    │  (0.25m GSD) │    │  Maps               │   │
+│  │  DFSAR Data  │    │  OHRC Images │    │  LOLA DEM + Illum.   │   │
+│  │ (L/S-band)   │    │  (0.25m GSD) │    │  Maps                │   │
 │  └──────┬───────┘    └──────┬───────┘    └──────────┬───────────┘   │
 │         │                   │                       │               │
 │         ▼                   ▼                       ▼               │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐   │
-│  │ Calibration   │    │   Boulder    │    │  Slope / Roughness  │   │
-│  │ + Speckle     │    │  Detection   │    │  + Illumination     │   │
-│  │   Filter      │    │              │    │    Analysis         │   │
+│  │ Calibration  │    │   Boulder    │    │  Slope / Roughness   │   │
+│  │ + Speckle    │    │  Detection   │    │  + Illumination      │   │
+│  │   Filter     │    │              │    │    Analysis          │   │
 │  └──────┬───────┘    └──────┬───────┘    └──────────┬───────────┘   │
 │         │                   │                       │               │
 │         ▼                   │                       │               │
 │  ┌──────────────┐           │                       │               │
 │  │  CPR / DOP   │           │                       │               │
-│  │  Computation  │           │                       │               │
+│  │  Computation │           │                       │               │
 │  └──────┬───────┘           │                       │               │
 │         │                   │                       │               │
 │         └───────────────────┼───────────────────────┘               │
 │                             │                                       │
 │                             ▼                                       │
-│                  ┌────────────────────┐                              │
-│                  │  ML Classifier     │                              │
-│                  │ (RF / XGBoost)     │                              │
-│                  │  Features: CPR,    │                              │
-│                  │  DOP, σ⁰, slope,  │                              │
-│                  │  roughness, illum. │                              │
-│                  └────────┬───────────┘                              │
+│                  ┌────────────────────┐                             │
+│                  │  ML Classifier     │                             │
+│                  │ (RF / XGBoost)     │                             │
+│                  │  Features: CPR,    │                             │
+│                  │  DOP, σ⁰, slope,   │                             │
+│                  │  roughness, illum. │                             │
+│                  └────────┬───────────┘                             │
 │                           │                                         │
 │              ┌────────────┼────────────┐                            │
 │              ▼            ▼            ▼                            │
-│     ┌──────────────┐ ┌─────────┐ ┌──────────────┐                  │
-│     │ Ice-Prob Map │ │ Landing │ │ Rover Path   │                  │
-│     │ + Volume Est.│ │  Site   │ │ Planning     │                  │
-│     │              │ │ Scoring │ │ (A* / D*)    │                  │
-│     └──────────────┘ └─────────┘ └──────────────┘                  │
+│     ┌──────────────┐ ┌─────────┐ ┌──────────────┐                   │
+│     │ Ice-Prob Map │ │ Landing │ │ Rover Path   │                   │
+│     │ + Volume Est.│ │  Site   │ │ Planning     │                   │
+│     │              │ │ Scoring │ │ (A* / D*)    │                   │
+│     └──────────────┘ └─────────┘ └──────────────┘                   │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
