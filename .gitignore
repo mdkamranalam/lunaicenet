@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env
+
+# Data files (do not commit large datasets to version control)
+data/
+*.tif
+*.tiff
+*.nc
+*.hdf5
+*.h5
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Streamlit config (if you create any local secrets)
+.streamlit/secrets.toml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
