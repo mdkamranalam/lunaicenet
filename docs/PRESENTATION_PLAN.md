@@ -1,67 +1,66 @@
 # Hackathon Presentation Plan
 
-This document outlines the strategy for presenting LunaIceNet to the hackathon judges. The presentation is designed for a strict 5-to-7 minute pitch window.
+This document outlines the strategy for presenting LunaIceNet, strictly aligned with the required **ISRO BAH 2026 Idea Submission Template**.
 
-## Core Pitch Narrative
-**Hook**: Most teams are using radar data to find "bright spots" (high CPR) and calling it ice. We know from scientific literature that rocks also look bright to radar. 
-**Solution**: LunaIceNet goes beyond basic radar processing. We built an AI pipeline that fuses radar with terrain data to eliminate false positives, and wrapped it in a full mission-planning dashboard that tells you exactly where to land and how to drive the rover there.
+## Presentation Structure (10 Slides)
+
+### Slide 1: Cover Page
+- **Team Name**: [Your Team Name]
+- **Problem Statement**: PS-8: Subsurface Ice Detection in Doubly-Shadowed Lunar Craters
+- **Team Leader Name**: [Leader Name]
+
+### Slide 2: Team Members
+- **Team Leader**: [Name, College]
+- **Team Member-1**: [Name, College]
+- **Team Member-2**: [Name, College]
+- **Team Member-3**: [Name, College]
+
+### Slide 3: Opportunity & USP
+- **How is it different?** Most existing approaches rely purely on a single radar threshold (CPR > 1) which creates false positives. LunaIceNet fuses radar physics (CPR & DOP) with topographical context (Slope/Roughness) using an AI model.
+- **How does it solve the problem?** It effectively eliminates false positives (e.g., radar-bright rocks on crater rims) and identifies stable subsurface ice inside thermally stable, doubly-shadowed regions.
+- **Unique Selling Proposition (USP)**: We don't just output a raw radar map. We provide an end-to-end mission planning platform that includes safe landing site selection, rover path optimization, and volumetric resource estimates.
+
+### Slide 4: Features Offered
+*Note: Include visual representations/icons for each feature.*
+- **Polarimetric Engine**: Refined Lee speckle filtering and CPR/DOP derivation from DFSAR data.
+- **Terrain Intelligence**: Slope, roughness, and illumination extraction from LOLA DEMs.
+- **ML Classifier**: High-confidence subsurface ice probability mapping.
+- **Safe-Landing Scorer**: Optimization function finding hazard-free landing zones.
+- **Rover Traverse Planner**: A* pathfinding to avoid steep slopes and deep shadows.
+- **Dashboard Interface**: Interactive Streamlit application for mission scientists.
+
+### Slide 5: Process Flow / Use-case Diagram
+- **Content**: A high-level flowchart depicting the data and user journey.
+- **Visual**: Data Ingestion (DFSAR/DEM) $\rightarrow$ Processing Engine $\rightarrow$ AI Classification $\rightarrow$ Landing Site & Path Routing $\rightarrow$ Dashboard Visualization.
+
+### Slide 6: Wireframes / Mock Diagrams
+- **Content**: Visuals of our proposed Streamlit dashboard interface.
+- **Visual**: Screenshots or wireframes showing the toggleable map layers (Raw Radar, Ice Probability Map, Rover Path, Landing Sites) and volume estimation panels.
+
+### Slide 7: Architecture Diagram
+- **Content**: The technical system architecture.
+- **Visual**: Embed the architectural diagram (from `SYSTEM_ARCHITECTURE.md`), showing the modular breakdown: Radar Engine, Terrain Engine, ML Engine, and Mission Planning Engine.
+
+### Slide 8: Technologies Used
+- **Core Languages**: Python 3.9+
+- **Geospatial Processing**: GDAL, Rasterio, PyProj
+- **Scientific Computing**: NumPy, SciPy
+- **Machine Learning**: Scikit-Learn (Random Forest), XGBoost
+- **Pathfinding & AI**: NetworkX (A* Algorithm), OpenCV
+- **Frontend / UI**: Streamlit, Matplotlib, Folium
+
+### Slide 9: Estimated Implementation Cost
+- **Content**: Software licensing costs are $0 since the entire stack relies on robust open-source tools.
+- **Computing Cost**: Minimal processing overhead. The system can be deployed on standard cloud instances (e.g., AWS EC2/GCP) for negligible cost, enabling scalable lunar resource mapping.
+
+### Slide 10: Conclusion / Q&A
+- **Content**: Summary statement, link to the open-source GitHub repository, team contact info, and an invitation for questions from the judging panel.
 
 ---
 
-## Slide Deck Breakdown (8 Slides)
-
-### Slide 1: Title & Vision
-- **Title**: LunaIceNet: AI-Driven Subsurface Ice Detection & Mission Planning
-- **Sub-title**: ISRO Bharatiya Antariksh Hackathon 2026 - Problem Statement 8
-- **Visual**: A striking rendering of a lunar crater in shadow.
-
-### Slide 2: The Problem (False Positives)
-- **Concept**: Finding ice isn't as simple as finding radar-bright spots.
-- **Visual**: Side-by-side comparison of a high-CPR region inside a PSR vs. a high-CPR region on a rocky crater wall.
-- **Talking Point**: "CPR > 1 is not enough. Rocks trick the radar."
-
-### Slide 3: The LunaIceNet Solution
-- **Concept**: Multi-modal data fusion.
-- **Visual**: High-level Architecture Diagram (from `SYSTEM_ARCHITECTURE.md`).
-- **Talking Point**: We use Chandrayaan-2 DFSAR for penetration, combined with LOLA DEMs and ML to distinguish volumetric ice scattering (low DOP) from surface rock scattering.
-
-### Slide 4: Scientific Processing (The Radar)
-- **Concept**: Show our technical rigor.
-- **Visual**: Raw DFSAR $\rightarrow$ Refined Lee Speckle Filter $\rightarrow$ CPR & DOP Maps.
-- **Talking Point**: Highlight the use of Stokes parameters and the critical DOP $< 0.13$ threshold.
-
-### Slide 5: The AI Engine
-- **Concept**: How we eliminate the false positives.
-- **Visual**: Feature importance chart from our Random Forest model showing Slope and DOP alongside CPR.
-- **Talking Point**: The ML model learns the geomorphological context.
-
-### Slide 6: Mission Planning (Landing & Traverse)
-- **Concept**: Translating science into engineering.
-- **Visual**: Heatmap of safe landing zones, and an A* path overlay avoiding steep slopes.
-- **Talking Point**: We don't just find the ice; we provide the safe landing coordinates and the rover path.
-
-### Slide 7: Live Demo / Dashboard Screenshots
-- **Concept**: Show the Streamlit app.
-- **Visual**: 2-3 clean screenshots or a very brief recorded GIF of the dashboard.
-- **Talking Point**: Interactive tool for mission scientists to adjust parameters and visualize resources.
-
-### Slide 8: Future Scope & Team
-- **Concept**: Scalability.
-- **Talking Point**: Ready for integration with future LUPEX mission data.
-
----
-
-## Live Demo Strategy
-If a live demo is permitted:
-1. Open the Streamlit dashboard.
+## Live Demo Strategy (If Applicable)
+If a live demo is permitted alongside the PPT:
+1. Open the Streamlit dashboard when presenting **Slide 6**.
 2. Select a target crater (e.g., Faustini or Shackleton).
-3. Toggle between the "Raw CPR" view and the "ML Ice Confidence" view to show how the AI removes the rocky crater rims from the potential targets.
-4. Click "Calculate Route" to show the A* algorithm generating a safe path from a flat landing zone.
-
-## Anticipated Q&A
-- **Q**: How did you handle the lack of ground-truth data for training the ML model?
-  - **A**: We used proxy labels. Thermally stable doubly-shadowed crater floors with high CPR were labeled as likely ice, while known rocky slopes outside PSRs were labeled as false positives.
-- **Q**: Why Refined Lee over a standard median filter?
-  - **A**: Standard filters blur the crater rims. Refined Lee uses local variance to preserve structural edges while smoothing the noise, which is critical for accurate slope and feature extraction.
-- **Q**: What depth does your volume estimate assume?
-  - **A**: We assume up to ~5 meters, based on the penetration depth of S-band and L-band radar in dry lunar regolith.
+3. Toggle between the "Raw CPR" view and the "ML Ice Confidence" view to practically demonstrate the USP (the AI removing rocky crater rims from the target list).
+4. Click "Calculate Route" to demonstrate the A* algorithm generating a safe path from a flat landing zone in real-time.
