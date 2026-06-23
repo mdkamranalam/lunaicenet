@@ -15,153 +15,50 @@ LunaIceNet is an end-to-end pipeline for detecting and quantifying subsurface wa
 
 ## 📋 Table of Contents
 
-- [Scientific Background](#-scientific-background)
+- [Documentation Hub](#-documentation-hub)
 - [Key Features](#-key-features)
-- [Architecture & Pipeline](#-architecture--pipeline)
-- [Tech Stack](#-tech-stack)
-- [Datasets](#-datasets)
 - [Installation](#-installation)
-- [Usage](#-usage)
+- [Quick Start / Usage](#-quick-start--usage)
 - [Deliverables](#-deliverables)
-- [Team & Timeline](#-team--timeline)
-- [References](#-references)
 - [License](#-license)
 
 ---
 
-## 🔬 Scientific Background
+## 📚 Documentation Hub
 
-### Permanently Shadowed Regions (PSRs)
+We have separated our comprehensive project details into dedicated markdown files for better readability. Please refer to the `docs/` directory:
 
-Lunar polar PSRs are terrain formations that never receive direct sunlight, maintaining extremely cold temperatures (often **< 100 K**) and acting as natural cold traps for volatiles. **Doubly-shadowed craters** — small craters nested inside larger PSRs whose raised rims block even scattered light — reach floor temperatures as low as **~25 K**, making them the highest-priority targets for water-ice exploration.
-
-### Radar Scattering Physics
-
-Fully polarimetric SAR transmits and receives both horizontal (H) and vertical (V) polarizations, enabling computation of key polarimetric invariants:
-
-| Metric | Definition | Ice Signature |
-|--------|-----------|---------------|
-| **CPR** (Circular Polarization Ratio) | Ratio of same-sense to opposite-sense circular-polarized echoes | **CPR > 1.0** (multiple internal scattering) |
-| **DOP** (Degree of Polarization) | Fraction of reflected wave retaining original polarization | **DOP < 0.13** (volumetric scatter depolarizes signal) |
-
-Prior work suggested CPR > 1 & DOP < 0.35 as ice indicators; Chandrayaan-2 analysis refined the DOP threshold to **< 0.13** for higher confidence.
-
-### The False-Positive Challenge
-
-Elevated CPR can also arise from rough, blocky terrain (crater walls, ejecta fields). For example, Shackleton crater's walls are radar-bright yet lack ice evidence, and Faustini crater's radar-bright PSR areas correspond to rock exposures. LunaIceNet addresses this through **multi-feature ML classification** combining radar metrics with terrain context.
+| Document | Description |
+|----------|-------------|
+| 🔬 **[Scientific Research](docs/RESEARCH.md)** | Physics of radar scattering, CPR/DOP, and overcoming the false-positive challenge. |
+| 📡 **[Datasets](docs/DATASETS.md)** | Specs for Chandrayaan-2 DFSAR, OHRC, LOLA DEMs, and illumination maps. |
+| 🏗️ **[System Architecture](docs/SYSTEM_ARCHITECTURE.md)** | Modular diagrams mapping data ingestion to the interactive dashboard. |
+| 🧮 **[Algorithms](docs/ALGORITHMS.md)** | Math behind the Refined Lee filter, Stokes parameters, ML, and A* pathfinding. |
+| 📊 **[Evaluation Strategy](docs/EVALUATION.md)** | Metrics, sanity checks, and volume uncertainty analysis. |
+| 🛠️ **[Tech Stack](docs/TECH_STACK.md)** | In-depth look at our Python-centric geospatial and machine learning stack. |
+| ⏱️ **[Implementation Plan](docs/IMPLEMENTATION_PLAN.md)** | Phase-by-phase execution strategy and task breakdown. |
+| 🎤 **[Presentation Plan](docs/PRESENTATION_PLAN.md)** | Pitch outline, slide breakdown, and demo strategy. |
 
 ---
 
 ## ✨ Key Features
 
-- **🛰️ Polarimetric Radar Processing** — Full-pipeline DFSAR calibration, speckle filtering (Refined Lee), and CPR/DOP map generation
-- **🤖 ML-Based Ice Classification** — Random Forest / XGBoost classifier using multi-dimensional features (CPR, DOP, σ⁰, slope, roughness, illumination) to suppress false positives
-- **🗺️ Ice-Probability Mapping** — Per-pixel probability maps (0–1) of ice presence across the crater floor
-- **🏔️ Terrain & Safety Analysis** — Slope, roughness, boulder detection, and illumination scoring for landing-site selection
-- **🚀 Landing-Site Recommendation** — Composite safety scoring with weighted slope, illumination, and boulder-density criteria
-- **🛤️ Rover Path Planning** — A*/D* pathfinding on cost grids weighted by terrain difficulty, energy cost, and hazard avoidance
-- **📊 Ice Volume Estimation** — Quantitative ice volume calculation with uncertainty bounds using backscatter-to-dielectric mixing models
-
----
-
-## 🏗️ Architecture & Pipeline
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        LunaIceNet Pipeline                          │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐   │
-│  │  DFSAR Data  │    │  OHRC Images │    │  LOLA DEM + Illum.   │   │
-│  │ (L/S-band)   │    │  (0.25m GSD) │    │  Maps                │   │
-│  └──────┬───────┘    └──────┬───────┘    └──────────┬───────────┘   │
-│         │                   │                       │               │
-│         ▼                   ▼                       ▼               │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐   │
-│  │ Calibration  │    │   Boulder    │    │  Slope / Roughness   │   │
-│  │ + Speckle    │    │  Detection   │    │  + Illumination      │   │
-│  │   Filter     │    │              │    │    Analysis          │   │
-│  └──────┬───────┘    └──────┬───────┘    └──────────┬───────────┘   │
-│         │                   │                       │               │
-│         ▼                   │                       │               │
-│  ┌──────────────┐           │                       │               │
-│  │  CPR / DOP   │           │                       │               │
-│  │  Computation │           │                       │               │
-│  └──────┬───────┘           │                       │               │
-│         │                   │                       │               │
-│         └───────────────────┼───────────────────────┘               │
-│                             │                                       │
-│                             ▼                                       │
-│                  ┌────────────────────┐                             │
-│                  │  ML Classifier     │                             │
-│                  │ (RF / XGBoost)     │                             │
-│                  │  Features: CPR,    │                             │
-│                  │  DOP, σ⁰, slope,   │                             │
-│                  │  roughness, illum. │                             │
-│                  └────────┬───────────┘                             │
-│                           │                                         │
-│              ┌────────────┼────────────┐                            │
-│              ▼            ▼            ▼                            │
-│     ┌──────────────┐ ┌─────────┐ ┌──────────────┐                   │
-│     │ Ice-Prob Map │ │ Landing │ │ Rover Path   │                   │
-│     │ + Volume Est.│ │  Site   │ │ Planning     │                   │
-│     │              │ │ Scoring │ │ (A* / D*)    │                   │
-│     └──────────────┘ └─────────┘ └──────────────┘                   │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### Pipeline Stages
-
-1. **Data Ingestion** — Load DFSAR full-polarization image stack (HH, HV, VH, VV channels) in GeoTIFF/PDS4 format
-2. **Calibration** — Convert raw DN to calibrated backscatter (σ⁰) using MIDAS coefficients
-3. **Speckle Filtering** — Apply Refined Lee polarimetric filter to reduce noise while preserving edges
-4. **CPR/DOP Computation** — Derive Circular Polarization Ratio and Degree of Polarization via Stokes parameters
-5. **Co-registration & Masking** — Align SAR maps with DEM/OHRC; mask non-PSR and low-SNR regions
-6. **Feature Engineering** — Assemble per-pixel feature vectors (CPR, DOP, σ⁰, slope, roughness, illumination)
-7. **ML Classification** — Train Random Forest/XGBoost to separate ice from rock; output ice-probability map
-8. **Terrain & Safety Scoring** — Score candidate landing sites using composite criteria
-9. **Path Planning** — Run A*/D* on cost grid from landing site to ice target
-10. **Volume Estimation** — Calculate ice volume with uncertainty: `V = A × depth × f`
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Tools |
-|----------|-------|
-| **SAR Processing** | ISRO MIDAS, PolSARPro/SNAP |
-| **Geospatial I/O** | `rasterio`, `GDAL`, QGIS/ArcGIS |
-| **Numerical Computing** | `NumPy`, `SciPy` |
-| **Machine Learning** | `scikit-learn` (Random Forest), `XGBoost` |
-| **Visualization** | `matplotlib`, QGIS |
-| **Image Analysis** | ENVI/IDL, MATLAB (optional) |
-| **Notebooks & VCS** | Jupyter, Git |
-| **Language** | Python 3.9+ |
-
----
-
-## 📡 Datasets
-
-| Dataset | Source | Resolution | Purpose |
-|---------|--------|------------|---------|
-| **Chandrayaan-2 DFSAR** (full-pol) | ISRO PDS (PRADAN/Bhuvan) | ~2 m slant-range | Compute σ⁰, CPR, DOP |
-| **Chandrayaan-2 OHRC** | ISRO PDS / Kaggle | 0.25 m GSD | Boulder/shadow mapping |
-| **LOLA DEM** (global) | NASA/USGS | 118 m | Slope, terrain context |
-| **LOLA DEM** (polar, targeted) | NASA PGDA | 5 m | Detailed topography |
-| **LROC/WAC Illumination Map** | ASU/LROC | – | Solar power analysis |
-| **LROC NAC Images** | NASA PDS | ~0.5 m | Rock detection (optional) |
-| **KPLO ShadowCam Mosaics** | ASU/NASA | – | Interpret radar-bright regions |
+- **🛰️ Polarimetric Radar Processing**: Full-pipeline DFSAR calibration, Refined Lee speckle filtering, and calculation of CPR & DOP invariants.
+- **🤖 ML-Based Ice Classification**: Random Forest/XGBoost classification fusing radar signatures with terrain context (slope, roughness) to drastically reduce rocky false-positives.
+- **🗺️ Ice-Probability Mapping**: Continuous probability mapping (0–1) over targeted PSRs.
+- **🏔️ Terrain Intelligence**: Automated landing site safety scoring using slope, illumination, and boulder hazard data.
+- **🛤️ Rover Path Planning**: A* pathfinding across a customized cost-grid from landing site to the subsurface ice deposit.
+- **📊 Volumetric Estimations**: Quantitative ice volume calculations with strict confidence bounds.
+- **🖥️ Mission Dashboard**: Interactive Streamlit interface to visualize all layers and engineering paths.
 
 ---
 
 ## ⚙️ Installation
 
 ### Prerequisites
-
 - Python 3.9+
-- GDAL libraries installed on your system
-- (Optional) ISRO MIDAS software for DFSAR validation
+- System-level GDAL libraries
+- (Optional) ISRO MIDAS software for independent DFSAR validation
 
 ### Setup
 
@@ -178,171 +75,43 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Dependencies
-
-```
-rasterio
-GDAL
-numpy
-scipy
-scikit-learn
-xgboost
-matplotlib
-networkx
-jupyter
-```
-
 ---
 
-## 🚀 Usage
+## 🚀 Quick Start / Usage
 
-### 1. Radar Data Processing
+The pipeline is fully accessible via our interactive Streamlit dashboard or through modular Python scripts.
 
-```python
-import rasterio
-import numpy as np
-import scipy.ndimage as nd
-
-# Load DFSAR full-pol channels
-hh = rasterio.open('data/dfsar_L_HH.tif').read(1)
-vv = rasterio.open('data/dfsar_L_VV.tif').read(1)
-hv = rasterio.open('data/dfsar_L_HV.tif').read(1)
-
-# Speckle filtering (Refined Lee recommended; median as fallback)
-hh_filt = nd.median_filter(hh, size=3)
-hv_filt = nd.median_filter(hv, size=3)
-vv_filt = nd.median_filter(vv, size=3)
-
-# Compute CPR and DOP via Stokes parameters
-sc = hh_filt + vv_filt
-oc = 2 * hv_filt
-cpr = sc / oc
-
-I = hh_filt + vv_filt
-Q = hh_filt - vv_filt
-U = 2 * hv_filt
-dop = np.sqrt(Q**2 + U**2) / I
+**To launch the Mission Dashboard:**
+```bash
+streamlit run dashboard/app.py
 ```
 
-### 2. Ice Detection Criteria
-
+**To run individual processing stages programmatically:**
 ```python
-# Flag candidate ice pixels (CPR > 1.0 and DOP < 0.13)
-ice_mask = (cpr > 1.0) & (dop < 0.13)
+# Example: Running the Radar Processing Engine
+from src.radar import polarimetry
+
+# Compute Stokes parameters and invariants
+cpr_map, dop_map = polarimetry.process_dfsar('data/dfsar_stack.tif', filter='refined_lee')
 ```
 
-### 3. ML Classification
-
-```python
-from sklearn.ensemble import RandomForestClassifier
-
-# Assemble feature matrix: [CPR, DOP, sigma0, slope, roughness, illumination]
-X = np.column_stack([cpr.ravel(), dop.ravel(), sigma0.ravel(),
-                     slope.ravel(), roughness.ravel(), illum.ravel()])
-
-clf = RandomForestClassifier(n_estimators=100, random_state=42)
-clf.fit(X_train, y_train)
-ice_prob = clf.predict_proba(X)[:, 1].reshape(cpr.shape)
-```
-
-### 4. Landing-Site Safety Scoring
-
-```python
-# Composite safety score
-score = (0.5 * (1 - slope / 15.0)
-       + 0.3 * illumination_pct
-       + 0.2 * (1 - boulder_density / boulder_density.max()))
-```
-
-### 5. Rover Path Planning (A*)
-
-```python
-# Cost function per grid cell
-distance = 1.0
-slope_factor = (slope / 15.0) ** 2
-illum_penalty = 1 - illum_fraction
-cost_cell = distance + 10 * slope_factor + 5 * illum_penalty
-
-# Run A* on cost grid (using networkx or custom implementation)
-```
-
-### 6. Ice Volume Estimation
-
-```python
-# Parameters
-pixel_area = 2.0 * 2.0       # m² (2m DFSAR resolution)
-ice_area = ice_mask.sum() * pixel_area  # total ice-suspect area
-depth = 5.0                   # meters (S-band penetration depth)
-f_low, f_mid, f_high = 0.1, 0.3, 0.5  # ice volume fraction range
-
-# Volume estimates
-V_mid = ice_area * depth * f_mid
-V_low = ice_area * depth * f_low
-V_high = ice_area * depth * f_high
-print(f"Ice Volume Estimate: {V_mid:.2e} m³ (range: {V_low:.2e} – {V_high:.2e} m³)")
-```
+*(See [ALGORITHMS.md](docs/ALGORITHMS.md) for deeper programmatic details).*
 
 ---
 
 ## 📦 Deliverables
 
-| Deliverable | Description |
-|-------------|-------------|
-| **CPR/DOP GeoTIFF** | Calibrated CPR and DOP maps over crater interior |
-| **Ice-Probability Map** | Per-pixel ML-based probability of ice presence (0–1) |
-| **Landing-Site Score Map** | Composite safety map highlighting optimal landing zones |
-| **Rover Path Overlay** | Optimal traverse from lander to ice target on hazard map |
-| **Ice Volume Estimate** | Numeric volume + uncertainty bounds table/chart |
-| **Code Repository & Notebooks** | Full pipeline scripts and Jupyter notebooks |
-| **Final Report/Presentation** | Summary slides, charts, and documentation |
-
----
-
-## 👥 Team & Timeline
-
-### Role Assignments
-
-| Role | Responsibilities |
-|------|-----------------|
-| **Member 1** — Radar Specialist | Data acquisition, preprocessing, calibration, CPR/DOP computation, ice volume calculation |
-| **Member 2** — Terrain Analyst | DEM/slope analysis, illumination mapping, boulder detection, landing-site scoring |
-| **Member 3** — ML Engineer | Feature engineering, classifier training (RF/XGB), ice-probability map, path planning |
-| **Member 4** — Integration Lead | Visualization, dashboard/notebook assembly, final integration & QA |
-
-### 30-Hour Hackathon Schedule
-
-| Hour | Phase | Task |
-|------|-------|------|
-| 0–1 | 🟦 Setup | Team kickoff, role assignment, environment setup |
-| 1–3 | 🟦 Data | Download DFSAR, OHRC, DEM datasets |
-| 3–5 | 🟩 SAR | Calibrate SAR (σ⁰), speckle filtering, compute CPR/DOP |
-| 5–6 | 🟩 SAR | Identify high-CPR regions (initial mask) |
-| 6–8 | 🟨 Terrain | Compute slope/roughness, detect boulders, score landing sites |
-| 9–11 | 🟪 ML | Assemble features, train/test classifier, produce ice-probability map |
-| 12–13 | 🟫 Path | Define cost function, run A*/D* pathfinding |
-| 14–16 | 🟧 Output | Calculate ice volume, generate visualizations, build dashboard |
-| 20–25 | 🔵 Review | Integrate results, QA, prepare report & slides |
-| 25–28 | 🔵 Review | Dry run presentation, final fixes |
-| 28–30 | 🔵 Delivery | Submit solution package |
-
----
-
-## 📚 References
-
-1. **Tarun et al., 2022** — *A software tool (MIDAS) for processing Chandrayaan-2 DFSAR* — Polarimetric processing and CPR computation methodology
-2. **Sinha et al., 2026** — *Subsurface ice in doubly shadowed craters* (Nature npj Space) — CPR/DOP analysis in lunar PSRs with refined DOP < 0.13 threshold
-3. **ISRO Chandrayaan-2 Factsheet** — DFSAR (L/S bands, 2–75 m SAR) and OHRC (0.25 m GSD) specifications
-4. **LRO-LOLA DEM Documentation** — Lunar global DEM (118 m) and high-resolution polar DEMs
-5. **LROC Polar Illumination Maps** — Time-weighted sunlight maps for PSR identification
-6. **UCLA Diviner/ShadowCam Studies** — Faustini crater PSR characteristics (rock vs. ice discrimination)
-7. **MIDAS Software (SAC/ISRO)** — Refined Lee filter and CPR routines for DFSAR
-8. **NASA ShadowCam** — Shackleton crater imagery for hazard detection validation
+1. **Processed GeoTIFFs**: Calibrated CPR and DOP maps.
+2. **Ice-Probability Map**: The final ML-driven predictive layer.
+3. **Mission Overlays**: Landing-site hazard maps and optimized rover traverse lines.
+4. **Volume Report**: Quantitative ice volume estimates.
+5. **Source Code**: Full reproducible pipeline and dashboard.
 
 ---
 
 ## 📄 License
 
-This project is developed as part of a hackathon challenge. See [LICENSE](LICENSE) for details.
+This project is developed as part of the ISRO Bharatiya Antariksh Hackathon 2026. See [LICENSE](LICENSE) for details.
 
 ---
 
