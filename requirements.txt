@@ -1,5 +1,8 @@
 streamlit
 numpy
+pandas
 scipy
 scikit-learn
 matplotlib
+spectral
+rasterio
