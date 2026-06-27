@@ -1,29 +1,46 @@
+from pathlib import Path
 from spectral import open_image
+import numpy as np
 import matplotlib.pyplot as plt
 
-print("Loading CPR...")
+ROOT = Path(__file__).resolve().parents[2]
+
 cpr = open_image(
-    r"D:\Programming\hackathon\lunaicenet\data\cpr\cpr.bin.hdr"
-)
-cpr_data = cpr.load()
+    str(ROOT / "data" / "cpr" / "cpr.bin.hdr")
+).load()
 
-print("Loading DOP...")
 dop = open_image(
-    r"D:\Programming\hackathon\lunaicenet\data\dop\dop.bin.hdr"
-)
-dop_data = dop.load()
+    str(ROOT / "data" / "dop" / "dop.bin.hdr")
+).load()
 
-print("CPR Shape:", cpr_data.shape)
-print("DOP Shape:", dop_data.shape)
+# remove channel dimension
+cpr = np.squeeze(cpr)
+dop = np.squeeze(dop)
 
-plt.figure(figsize=(8,6))
-plt.imshow(cpr_data)
+# replace NaNs
+cpr = np.nan_to_num(cpr)
+dop = np.nan_to_num(dop)
+
+print("CPR")
+print("shape:", cpr.shape)
+print("min:", np.min(cpr))
+print("max:", np.max(cpr))
+
+print()
+
+print("DOP")
+print("shape:", dop.shape)
+print("min:", np.min(dop))
+print("max:", np.max(dop))
+
+plt.figure(figsize=(10,6))
+plt.imshow(cpr, cmap='gray')
 plt.title("CPR")
 plt.colorbar()
 plt.show()
 
-plt.figure(figsize=(8,6))
-plt.imshow(dop_data)
+plt.figure(figsize=(10,6))
+plt.imshow(dop, cmap='gray')
 plt.title("DOP")
 plt.colorbar()
 plt.show()
