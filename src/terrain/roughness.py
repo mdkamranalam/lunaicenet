@@ -1,24 +1,46 @@
+import rasterio
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import generic_filter
-from read_dem import load_dem
 
-def calculate_roughness(dem):
-    roughness = generic_filter(dem, np.std, size=5)
-    return roughness
+DEM_PATH = "data/dem/lola_dem.tif"
 
-if __name__ == "__main__":
-    dem, _, _ = load_dem("data/dem/lola_dem.tif")
-    roughness = calculate_roughness(dem)
+print("Loading DEM...")
 
-    print()
-    print("Roughness statistics")
-    print("Min:", roughness.min())
-    print("Max:", roughness.max())
-    print("Mean:", roughness.mean())
+with rasterio.open(DEM_PATH) as src:
+    dem = src.read(1).astype(np.float32)
 
-    plt.figure(figsize=(8,8))
-    plt.imshow(roughness)
-    plt.colorbar()
-    plt.title("Terrain Roughness")
-    plt.show()
+# Downsample first
+print("Downsampling DEM...")
+dem = dem[::20, ::20]
+
+print("DEM shape:", dem.shape)
+
+print("Computing roughness...")
+
+roughness = generic_filter(
+    dem,
+    np.std,
+    size=5
+)
+
+print("\nRoughness Statistics")
+print("-------------------")
+print("Min:", np.nanmin(roughness))
+print("Max:", np.nanmax(roughness))
+print("Mean:", np.nanmean(roughness))
+
+np.save("data/dem/roughness.npy", roughness)
+
+plt.figure(figsize=(10,6))
+plt.imshow(
+    roughness,
+    cmap="viridis",
+    vmin=np.percentile(roughness,5),
+    vmax=np.percentile(roughness,99)
+)
+
+plt.colorbar(label="Terrain Roughness")
+plt.title("Lunar Terrain Roughness")
+plt.tight_layout()
+plt.show()

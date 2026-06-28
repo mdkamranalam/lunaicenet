@@ -1,26 +1,26 @@
+import rasterio
 import numpy as np
 import matplotlib.pyplot as plt
-from read_dem import load_dem
 
-def calculate_slope(dem):
-    dx = np.gradient(dem, axis=1)
-    dy = np.gradient(dem, axis=0)
-    slope = np.degrees(np.arctan(np.sqrt(dx**2 + dy**2)))
-    return slope
+DEM_PATH = "data/dem/lola_dem.tif"
 
+with rasterio.open(DEM_PATH) as src:
+    dem = src.read(1)
 
-if __name__ == "__main__":
-    dem, _, _ = load_dem("data/dem/lola_dem.tif")
-    slope = calculate_slope(dem)
+dy, dx = np.gradient(dem)
+slope = np.sqrt(dx**2 + dy**2)
 
-    print()
-    print("Slope statistics")
-    print("Min:", slope.min())
-    print("Max:", slope.max())
-    print("Mean:", slope.mean())
+print("Slope")
+print("Min:", np.nanmin(slope))
+print("Max:", np.nanmax(slope))
+print("Mean:", np.nanmean(slope))
 
-    plt.figure(figsize=(8,8))
-    plt.imshow(slope)
-    plt.colorbar()
-    plt.title("Slope Map")
-    plt.show()
+np.save("data/dem/slope.npy", slope)
+
+display = slope[::20, ::20]
+
+plt.figure(figsize=(10,6))
+plt.imshow(display, cmap="inferno")
+plt.colorbar(label="Slope")
+plt.title("Lunar Slope Map")
+plt.show()
