@@ -5,17 +5,24 @@ import pandas as pd
 
 print("Loading landing suitability map...")
 
-landing = np.load(
+# --------------------------------------------------
+# Load and downsample
+# --------------------------------------------------
+landing_full = np.load(
     "data/landing_score.npy"
 )
 
-print("Shape:", landing.shape)
+landing = landing_full[::20, ::20]
+
+print("Original shape:", landing_full.shape)
+print("Working shape :", landing.shape)
 
 # --------------------------------------------------
-# Select best regions
+# Candidate threshold
 # --------------------------------------------------
-THRESHOLD = 0.80
+THRESHOLD = 0.90
 candidate_mask = landing > THRESHOLD
+
 print()
 print("Candidate pixels:",
       np.sum(candidate_mask))
@@ -26,40 +33,58 @@ print("Candidate pixels:",
 labels, num = ndimage.label(
     candidate_mask
 )
+
 print(
     "Candidate regions:",
     num
 )
 
 # --------------------------------------------------
-# Extract site statistics
+# Extract statistics
 # --------------------------------------------------
 sites = []
+objects = ndimage.find_objects(labels)
 
-for i in range(1, num + 1):
-    mask = labels == i
-    area = np.sum(mask)
-
-    # ignore tiny regions
-    if area < 20:
+for idx, slc in enumerate(objects):
+    if slc is None:
         continue
 
-    y, x = ndimage.center_of_mass(mask)
-    score = np.mean(
-        landing[mask]
-    )
+    region = labels[slc] == (idx + 1)
 
-    maximum = np.max(
-        landing[mask]
-    )
+    area = np.sum(region)
+
+    # ignore tiny regions
+    if area < 3:
+        continue
+
+    y, x = ndimage.center_of_mass(region)
+
+    y += slc[0].start
+    x += slc[1].start
+
+    values = landing[
+        labels == (idx + 1)
+    ]
 
     sites.append({
-        "site_id": len(sites)+1,
-        "x": int(x),
-        "y": int(y),
-        "pixels": int(area),
-        "mean_score": float(score),
-        "max_score": float(maximum)
+        "site_id":
+            len(sites) + 1,
+
+        # convert back to full resolution
+        "x":
+            int(x * 20),
+
+        "y":
+            int(y * 20),
+
+        "pixels":
+            int(area * 400),
+
+        "mean_score":
+            float(np.mean(values)),
+
+        "max_score":
+            float(np.max(values))
     })
 
 # --------------------------------------------------
@@ -85,33 +110,51 @@ df.to_csv(
     "data/candidate_sites.csv",
     index=False
 )
+
 print()
-print(
-    "Saved:",
-    "data/candidate_sites.csv"
-)
+print("Saved:")
+print("data/candidate_sites.csv")
+
+print()
+print("Total candidate sites:",
+      len(df))
+
+print("Region", idx+1, "area =", area)
 
 # --------------------------------------------------
 # Visualization
 # --------------------------------------------------
-display = landing[::20, ::20]
-plt.figure(figsize=(10,6))
+plt.figure(figsize=(12,7))
 plt.imshow(
-    display,
-    cmap="viridis"
+    landing,
+    cmap="viridis",
+    vmin=np.percentile(landing,5),
+    vmax=np.percentile(landing,99)
 )
 
 for _, row in df.head(20).iterrows():
     plt.scatter(
-        row["x"]/20,
-        row["y"]/20,
+        row["x"] / 20,
+        row["y"] / 20,
         c="red",
-        s=50,
+        s=80,
         marker="x"
     )
 
+    plt.text(
+        row["x"] / 20 + 5,
+        row["y"] / 20,
+        str(row["site_id"]),
+        color="white",
+        fontsize=8
+    )
+
+plt.colorbar(
+    label="Landing Suitability"
+)
+
 plt.title(
-    "Top Candidate Landing Sites"
+    "Top Candidate Lunar Landing Sites"
 )
 
 plt.tight_layout()
