@@ -6,4 +6,4 @@ scikit-learn
 matplotlib
 spectral
 rasterio
-gdal
+scipy
