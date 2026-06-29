@@ -340,6 +340,85 @@ into a unified lunar decision-support system.
 
 ---
 
+# Slide Title
+
+# 💰 Operational Cost & Mission Efficiency Analysis
+
+---
+
+## ⏱ Mission Planning Time Reduction
+
+| Traditional Workflow | LunaIceNet Workflow |
+| -------------------- | ------------------- |
+| 6–12 Weeks           | < 1 Hour            |
+
+### Traditional Workflow
+
+• DEM Analysis: 2–3 weeks
+• Hazard Assessment: 1–2 weeks
+• Radar Ice Analysis: 2–4 weeks
+• Candidate Site Selection: ~1 week
+• Landing Validation: 1–2 weeks
+
+### LunaIceNet
+
+• DEM Processing: Minutes
+• Hazard Mapping: Minutes
+• Ice Detection: Minutes
+• Candidate Extraction: Seconds
+• Landing Validation: Seconds
+• Mission Ranking: Seconds
+
+---
+
+## 💻 Computational Requirements
+
+| Resource             | Requirement             |
+| -------------------- | ----------------------- |
+| CPU                  | Standard Laptop/Desktop |
+| GPU                  | Not Required            |
+| RAM                  | 16–32 GB                |
+| Cloud Infrastructure | Not Required            |
+| Paid APIs            | None                    |
+| Internet Dependency  | None                    |
+| Software Cost        | ₹0                      |
+
+---
+
+## 📊 Prototype Processing Scale
+
+| Metric                       | Value        |
+| ---------------------------- | ------------ |
+| Terrain Pixels Processed     | 353 Million  |
+| Radar Observations Processed | 54.6 Million |
+| Safe Landing Pixels          | 95 Million   |
+| Candidate Regions            | 565          |
+| Candidate Landing Sites      | 424          |
+| Final Mission Sites          | Top 20       |
+
+---
+
+## 🚀 Operational Benefits
+
+✅ 100% Offline Execution
+
+✅ No Cloud or Paid API Dependency
+
+✅ AI-Assisted Landing Site Ranking
+
+✅ Explainable Mission Recommendations
+
+✅ Rapid Mission Replanning Capability
+
+✅ Scalable for Future ISRO Lunar Missions
+
+---
+
+### Key Takeaway
+
+> **LunaIceNet reduces lunar landing site analysis from several weeks of manual scientific processing to less than one hour of AI-assisted automated analysis using entirely open-source software and commodity hardware.**
+
+
 # Final Vision Statement
 
 > "LunaIceNet aims to become a complete AI-powered autonomous lunar exploration and mission planning platform for future robotic and human missions to the Moon."
