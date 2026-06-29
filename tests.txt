@@ -1,0 +1,298 @@
+========== Radar (CPR and DOP) ============
+*** 1.
+python .\src\radar\read_products.py
+CPR
+shape: (223725, 244)
+min: 0.0
+max: 1121.6805
+
+DOP
+shape: (223725, 244)
+min: 0.0
+max: 1.0
+
+
+*** 2.
+python .\src\radar\histograms.py
+
+
+*** 3.
+python .\src\radar\statistics.py
+CPR Statistics
+----------------
+mean: 1.2190813
+median: 1.01532
+std: 0.93843096
+95 percentile: 2.7163205
+99 percentile: 4.302105
+
+DOP Statistics
+----------------
+mean: 0.7450196
+median: 0.7841735
+std: 0.16830166
+95 percentile: 0.94777864
+99 percentile: 0.9781397
+
+
+
+
+
+========== Tarrain (Ice Detection and Rover Landing) ===========
+
+
+
+
+
+*** 1. 
+python src/terrain/read_dem.py
+DEM loaded
+Shape: (15360, 23040)
+Resolution: (59.22529379774306, 59.22529379557292)
+Min: 1732.3022
+Max: 1743.5494
+--- Figure_1 - Lunar DEM
+
+*** 2.
+python src/terrain/slope.py
+Slope
+Min: 0.0
+Max: 0.48477095
+Mean: 0.007904619
+--- Figure_2 - Lunar Slope Map
+
+
+*** 3.
+python src/terrain/roughness.py
+Loading DEM...
+Downsampling DEM...
+DEM shape: (768, 1152)
+Computing roughness...
+
+Roughness Statistics
+-------------------
+Min: 0.0023151124
+Max: 1.0339296
+Mean: 0.16925484
+--- Figure_3 - Lunar Terrain Roughness
+
+
+*** 4.
+python src/terrain/hazards.py
+Loading terrain products...
+Slope shape: (15360, 23040)
+Roughness shape: (768, 1152)
+Resampling roughness by factors (20.00, 20.00)
+
+Hazard Statistics
+------------------
+Min: 0.0014479469
+Max: 0.735719
+Mean: 0.1047947
+--- Figure_4 - Lunar Hazard Map
+
+
+*** 5.
+python src/terrain/safe_zones.py
+Loading hazard map...
+
+Using hazard threshold: 0.06
+
+Safe Zone Statistics
+--------------------
+Total pixels : 353894400
+Safe pixels  : 95016869
+Safe percent : 26.85 %
+--- Figure_5 - Lunar Safe Zones (threshold=0.06)
+
+
+*** 6.
+python src/ice_detection/ice_confidence.py
+Loading CPR...
+Loading DOP...
+
+Input Statistics
+----------------
+CPR shape: (223725, 244)
+DOP shape: (223725, 244)
+CPR range: 0.0 -> 1121.6805
+DOP range: 0.0 -> 1.0
+
+Ice Statistics
+----------------
+Low confidence: 40152094
+Medium confidence: 520855
+High confidence: 0
+Total pixels: 54588900
+
+Saved:
+D:\Programming\hackathon\lunaicenet\data\ice\ice_confidence.npy
+--- Figure_6 - Lunar Ice Confidence Map
+
+
+*** 7.
+python src/landing/landing_score.py
+Loading products...
+Ice: (223725, 244)
+Hazard: (15360, 23040)
+Safe: (15360, 23040)
+Resampling ice by (0.0687, 94.4262)
+
+Landing Statistics
+------------------
+Min: 0.0
+Max: 1.0
+Mean: 0.3663456978221579
+
+Excellent sites: 70858007
+Good sites: 24158862
+Poor sites: 258877531
+--- Figure_7 - Lunar Landing Suitability Map
+
+
+*** 8.
+python src/landing/candidate_sites.py
+Loading landing suitability map...
+Original shape: (15360, 23040)
+Working shape : (768, 1152)
+
+Candidate pixels: 2430
+Candidate regions: 565
+
+Top Candidate Sites
+-------------------
+    site_id      x      y  pixels  mean_score  max_score
+0       416   6350  15060    1600    0.999640   0.999864
+1       317   1040  12900    2000    0.999623   0.999811
+2       364    430  14260    4000    0.999386   0.999715
+3       368     70  14300    3200    0.999340   0.999700
+4       356    190  14220    1600    0.999263   0.999347
+5        44    380   2120    2000    0.999212   0.999482
+6       388    480  14600    2000    0.999140   0.999254
+7       278  20000  10880    2000    0.999071   0.999212
+8       347   5450  14020    4000    0.999053   0.999645
+9       314    660  12780    2000    0.999043   0.999598
+10       36    380   1880    2000    0.999025   0.999235
+11      412   6350  14940    1600    0.998889   0.999134
+12       82    950   3100    1600    0.998882   0.998926
+13      408   6540  14880    2000    0.998791   0.999061
+14      406   3080  14880    3600    0.998779   0.999258
+15      393    570  14680    1600    0.998768   0.998923
+16      341   9380  13740    2000    0.998712   0.998886
+17       83   3700   3100    2000    0.998638   0.999293
+18      255   2280  10320    2000    0.998629   0.998720
+19      185   8060   6640    2000    0.998622   0.998741
+
+Saved:
+data/candidate_sites.csv
+
+Total candidate sites: 424
+Region 565 area = 5
+---Figure_8 - Top Candidate Lunar Landing Sites
+
+
+*** 9.
+python src/landing/final_ranking.py
+Loading products...
+Sites : 424
+Hazard: (15360, 23040)
+Safe  : (15360, 23040)
+Ice   : (223725, 244)
+
+Resampling ice by (0.0687, 94.4262)
+
+TOP 20 LANDING SITES
+--------------------
+    site_id      x      y   landing    hazard  safe       ice  mission_score
+2     364.0    430  14260  0.999386  0.003531   1.0  0.666667       0.948871
+0     416.0   6350  15060  0.999640  0.003971   1.0  0.666667       0.948863
+3     368.0     70  14300  0.999340  0.003950   1.0  0.666667       0.948749
+1     317.0   1040  12900  0.999623  0.005766   1.0  0.666667       0.948408
+20    268.0   8770  10740  0.998570  0.004174   1.0  0.666667       0.948385
+6     388.0    480  14600  0.999140  0.005570   1.0  0.666667       0.948264
+5      44.0    380   2120  0.999212  0.005812   1.0  0.666667       0.948232
+9     314.0    660  12780  0.999043  0.005562   1.0  0.666667       0.948227
+8     347.0   5450  14020  0.999053  0.005773   1.0  0.666667       0.948178
+7     278.0  20000  10880  0.999071  0.006049   1.0  0.666667       0.948116
+4     356.0    190  14220  0.999263  0.006660   1.0  0.666667       0.948040
+10     36.0    380   1880  0.999025  0.006651   1.0  0.666667       0.947947
+22    323.0  20200  13160  0.998560  0.006296   1.0  0.666667       0.947850
+21     35.0   4080   1860  0.998563  0.006629   1.0  0.666667       0.947768
+91    284.0  13660  11160  0.997304  0.004705   1.0  0.666667       0.947745
+14    406.0   3080  14880  0.998779  0.007211   1.0  0.666667       0.947709
+17     83.0   3700   3100  0.998638  0.007011   1.0  0.666667       0.947703
+13    408.0   6540  14880  0.998791  0.007381   1.0  0.666667       0.947671
+15    393.0    570  14680  0.998768  0.007539   1.0  0.666667       0.947623
+16    341.0   9380  13740  0.998712  0.007502   1.0  0.666667       0.947609
+
+Saved: data/final_sites.csv
+--- Figure_9 - Top Ranked Lunar Landind Sites
+
+*** 10.
+python src/landing/landing_ellipse.py
+Loading products...
+
+Evaluating landing ellipses...
+
+TOP LANDING ELLIPSES
+--------------------
+    site_id      x      y  mission_score  ellipse_safe  ellipse_hazard  confidence
+2     368.0     70  14300       0.948749      1.000000        0.004890    0.997555
+3     317.0   1040  12900       0.948408      1.000000        0.006098    0.996951
+1     416.0   6350  15060       0.948863      1.000000        0.006469    0.996765
+5     388.0    480  14600       0.948264      1.000000        0.007075    0.996462
+11     36.0    380   1880       0.947947      1.000000        0.007425    0.996287
+6      44.0    380   2120       0.948232      1.000000        0.007921    0.996039
+18    393.0    570  14680       0.947623      1.000000        0.008256    0.995872
+15    406.0   3080  14880       0.947709      1.000000        0.008290    0.995855
+16     83.0   3700   3100       0.947703      1.000000        0.008401    0.995799
+4     268.0   8770  10740       0.948385      1.000000        0.008648    0.995676
+8     347.0   5450  14020       0.948178      1.000000        0.008800    0.995600
+9     278.0  20000  10880       0.948116      1.000000        0.008806    0.995597
+19    341.0   9380  13740       0.947609      1.000000        0.010228    0.994886
+7     314.0    660  12780       0.948227      1.000000        0.011373    0.994313
+17    408.0   6540  14880       0.947671      0.994240        0.008705    0.992767
+12    323.0  20200  13160       0.947850      0.942476        0.016415    0.963030
+10    356.0    190  14220       0.948040      0.920921        0.013040    0.953941
+0     364.0    430  14260       0.948871      0.897428        0.015417    0.941005
+13     35.0   4080   1860       0.947768      0.859919        0.022858    0.918531
+14    284.0  13660  11160       0.947745      0.717926        0.040497    0.838715
+
+Saved: data/landing_ellipses.csv
+--- Figure_10 - Top Landind Ellipses
+
+
+*** 11.
+python src/landing/mission_report.py
+Loading products...
+Resampling ice by (0.0687, 94.4262)
+
+MISSION REPORT
+----------------
+    site_id      x      y  mission_score  ellipse_confidence    hazard  safe     ice recommendation
+0       368     70  14300       0.948749            0.997555  0.003950  True  Medium      EXCELLENT
+1       317   1040  12900       0.948408            0.996951  0.005766  True  Medium      EXCELLENT
+2       416   6350  15060       0.948863            0.996765  0.003971  True  Medium      EXCELLENT
+3       388    480  14600       0.948264            0.996462  0.005570  True  Medium      EXCELLENT
+4        36    380   1880       0.947947            0.996287  0.006651  True  Medium      EXCELLENT
+5        44    380   2120       0.948232            0.996039  0.005812  True  Medium      EXCELLENT
+6       393    570  14680       0.947623            0.995872  0.007539  True  Medium      EXCELLENT
+7       406   3080  14880       0.947709            0.995855  0.007211  True  Medium      EXCELLENT
+8        83   3700   3100       0.947703            0.995799  0.007011  True  Medium      EXCELLENT
+9       268   8770  10740       0.948385            0.995676  0.004174  True  Medium      EXCELLENT
+10      347   5450  14020       0.948178            0.995600  0.005773  True  Medium      EXCELLENT
+11      278  20000  10880       0.948116            0.995597  0.006049  True  Medium      EXCELLENT
+12      341   9380  13740       0.947609            0.994886  0.007502  True  Medium      EXCELLENT
+13      314    660  12780       0.948227            0.994313  0.005562  True  Medium      EXCELLENT
+14      408   6540  14880       0.947671            0.992767  0.007381  True  Medium      EXCELLENT
+15      323  20200  13160       0.947850            0.963030  0.006296  True  Medium           GOOD
+16      356    190  14220       0.948040            0.953941  0.006660  True  Medium           GOOD
+17      364    430  14260       0.948871            0.941005  0.003531  True  Medium          RISKY
+18       35   4080   1860       0.947768            0.918531  0.006629  True  Medium          RISKY
+19      284  13660  11160       0.947745            0.838715  0.004705  True  Medium          RISKY
+
+Saved: data/mission_report.csv
+
+
+*** 12.
+streamlit run dashboard/app.py
